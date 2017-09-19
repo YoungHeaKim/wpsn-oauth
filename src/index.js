@@ -8,6 +8,7 @@ const csurf = require('csurf')
 const flash = require('connect-flash')
 const passport = require('passport')
 const GitHubStrategy = require('passport-github').Strategy
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const util = require('./util')
 const query = require('./query')
@@ -60,6 +61,24 @@ passport.use(new GitHubStrategy({
   // github에 원하는 아이디가 있으면 접속하고 아니면 새로만든다.
   query.firstOrCreateUserByProvider(
     'github',
+    profile.id,
+    accessToken,
+    avatar_url
+  ).then(user => {
+    done(null, user)
+  }).catch(err => {
+    done(err)
+  })
+}))
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE _CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_CALLBACK_URL
+}, (accessToken, refreshToken, profile, done) => {
+  // google에 원하는 아이디가 있으면 접속하고 아니면 새로만든다.
+  query.firstOrCreateUserByProvider(
+    'google',
     profile.id,
     accessToken,
     avatar_url
