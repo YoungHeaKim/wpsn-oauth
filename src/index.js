@@ -56,10 +56,13 @@ passport.use(new GitHubStrategy({
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
   callbackURL: process.env.GITHUB_CALLBACK_URL
 }, (accessToken, refreshToken, profile, done) => {
+  const avatar_url = profile.photos[0] ? profile.photos[0].value : null
+  // github에 원하는 아이디가 있으면 접속하고 아니면 새로만든다.
   query.firstOrCreateUserByProvider(
     'github',
     profile.id,
-    accessToken
+    accessToken,
+    avatar_url
   ).then(user => {
     done(null, user)
   }).catch(err => {
