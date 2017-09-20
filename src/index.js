@@ -72,10 +72,11 @@ passport.use(new GitHubStrategy({
 }))
 
 passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE _CLIENT_ID,
+  clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: process.env.GOOGLE_CALLBACK_URL
 }, (accessToken, refreshToken, profile, done) => {
+  const avatar_url = profile.photos[0] ? profile.photos[0].value : null
   // google에 원하는 아이디가 있으면 접속하고 아니면 새로만든다.
   query.firstOrCreateUserByProvider(
     'google',
@@ -110,6 +111,13 @@ app.get('/auth/github/callback', passport.authenticate('github', {
   failureFlash: true
 }))
 
+app.get('/auth/google',passport.authenticate('google', { scope: ['profile'] }));
+
+app.get('/auth/google/callback', passport.authenticate('google', {
+  successRedirect: '/',
+  failureRedirect: '/login',
+  failureFlash: true
+}))
 
 app.listen(PORT, () => {
   console.log(`listening ${PORT}...`)
